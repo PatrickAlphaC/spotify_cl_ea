@@ -1,6 +1,16 @@
-### Official Alpha Vantage Chainlink external adapter for python 3+
+### Spotify Adadpter
 
-Full documentation for Alpha Vantage can be found [here](https://www.alphavantage.co/documentation/)
+# For Contract Developers wanting to use the adapter
+
+This job is currently hosted on node `0xB36d3709e22F7c708348E225b20b13eA546E6D9c` with job ID `903c5a53e95141218e2784a6142f53a5`
+
+Please check out sample.sol for some sample use of getting data from the adapter.
+
+Follow the instructions from: https://docs.chain.link/docs/example-walkthrough, but instead of using `ATestNetConsumer.sol` use `sample.sol` from this repo. And in `requestPopularity` enter the artist ID. 
+
+
+
+### For external adapter developers and node operators
 
 **Adapter Formats**: Google Cloud Function, AWS Lambda and Docker
 
@@ -23,60 +33,57 @@ You can get one [here](https://www.alphavantage.co/support/#api-key)
 ## Docker Installation:
 Build the image
 ```
-docker build -t alpha-vantage-cl-ea .
+docker build -t spotify_cl_ea .
 ```
-Run the container while passing in your ALPHAVANTAGE_API_KEY
+Run the container while passing in your SPOTIFY_CLIENT_ID and SPOTIFY_CLIENT_SECRET
 ```
-docker run -e ALPHAVANTAGE_API_KEY=************** -p 5000:5000 alpha-vantage-cl-ea
+docker run -e SPOTIFY_CLIENT_ID=************** -e SPOTIFY_CLIENT_SECRET=************* -p 5000:5000 spotify_cl_ea
 ```
-The adapter endpoint will be accessable from ```http://localhost/:5000/alpha-vantage-cl-ea```
+The adapter endpoint will be accessable from ```http://localhost/:5000/spotify_cl_ea```
 
 ## Sample call:
 ```
-curl -X POST "https://us-central1-chainlink-256615.cloudfunctions.net/function-1" -H "Content-Type:application/json" --data '{"data": {"function":"GLOBAL_QUOTE", "symbol":"TSLA"}}'
+curl -X POST "https://us-central1-chainlink-256615.cloudfunctions.net/function-1" -H "Content-Type:application/json" --data '{"data": {"artist": "246dkjvS1zLTtiykXe5h60"}}'
 ```
 Sample return:
 ```
 {
-  "jobRunID": "", "data": {
-  "Global Quote": {
-    "01. symbol": "TSLA", 
-    "02. open": "319.6200", 
-    "03. high": "323.5000", 
-    "04. low": "316.1180", 
-    "05. price": "317.2200", 
-    "06. volume": "6615477", 
-    "07. latest trading day": "2019-11-05", 
-    "08. previous close": "317.4700", 
-    "09. change": "-0.2500", 
-    "10. change percent": "-0.0787%"}
-    }, 
-  "status": "200"
+  "external_urls": {
+    "spotify": "https://open.spotify.com/artist/246dkjvS1zLTtiykXe5h60"
+  },
+  "followers": {
+    "href": null,
+    "total": 24543702
+  },
+  "genres": [
+    "dfw rap",
+    "melodic rap",
+    "rap"
+  ],
+  "href": "https://api.spotify.com/v1/artists/246dkjvS1zLTtiykXe5h60",
+  "id": "246dkjvS1zLTtiykXe5h60",
+  "images": [
+    {
+      "height": 640,
+      "url": "https://i.scdn.co/image/93fec27f9aac86526b9010e882037afbda4e3d5f",
+      "width": 640
+    },
+    {
+      "height": 320,
+      "url": "https://i.scdn.co/image/9040899d5660920fdf7efeb7aa2cc4e6d86f86f6",
+      "width": 320
+    },
+    {
+      "height": 160,
+      "url": "https://i.scdn.co/image/d15a5ffb3d22adabd09a749e09e846f527ab5a94",
+      "width": 160
+    }
+  ],
+  "name": "Post Malone",
+  "popularity": 96,
+  "type": "artist",
+  "uri": "spotify:artist:246dkjvS1zLTtiykXe5h60"
 }
-```
-
-## Sample Web Job Spec
-```
-{
-  "initiators": [
-    {
-      "type": "web",
-      "params": {
-      }
-    }
-  ],
-  "tasks": [
-    {
-      "type": "alpha-vantage-cl-ea,
-      "confirmations": 0,
-      "params": {
-        "function": "GLOBAL_QUOTE",
-        "symbol": "MSFT"
-      }
-    }
-  ],
-  "startAt": null,
-  "endAt": null
 ```
 
 ## Sample Job Spec
@@ -92,7 +99,7 @@ Sample return:
   ],
   "tasks": [
     {
-      "type": "alpha_vantage_cl_ea",
+      "type": "spotify-adapter",
       "confirmations": null,
       "params": {
       }
@@ -110,7 +117,7 @@ Sample return:
       }
     },
     {
-      "type": "ethint256",
+      "type": "ethuint256",
       "confirmations": null,
       "params": {
       }
@@ -127,9 +134,9 @@ Sample return:
 }
 ```
 
-Full documentation for Alpha Vantage can be found [here](https://www.alphavantage.co/documentation/)
 
 ## Testing
+# Currently broken
 
 To test just the URL creation run:
 ```python -m pytest -k test_url_creation```

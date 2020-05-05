@@ -1,128 +1,54 @@
-pragma solidity 0.4.24;
+pragma solidity >= 0.4.20;
 
-import "https://github.com/smartcontractkit/chainlink/evm/contracts/ChainlinkClient.sol";
-import "https://github.com/smartcontractkit/chainlink/evm/contracts/vendor/Ownable.sol";
+import "https://github.com/smartcontractkit/chainlink/evm-contracts/src/v0.4/ChainlinkClient.sol";
+import "https://github.com/smartcontractkit/chainlink/evm-contracts/src/v0.4/vendor/Ownable.sol";
 
-contract ATestnetConsumer is ChainlinkClient, Ownable {
+contract Test is ChainlinkClient, Ownable {
+  // This is the LINK payment, currently set to 1 LINK
+  // Get free testnet LINK here: https://ropsten.chain.link/
+  // Get free testnet ETH here: https://faucet.ropsten.be/
   uint256 constant private ORACLE_PAYMENT = 1 * LINK;
-
-  uint256 public currentPrice;
-  int256 public changeDay;
-  bytes32 public lastMarket;
-  uint256 public ticker_price;
-
-  event RequestEthereumPriceFulfilled(
-    bytes32 indexed requestId,
-    uint256 indexed price
-  );
+  uint256 public popularity;
   
-  event RequestTickerPriceFulfilled(
-    bytes32 indexed requestId,
-    uint256 indexed price
-  );
+  // The addresses of the Alpha Vantage Ropsten node
+  address ALPHA_VANTAGE_ADDRESS_ROPSTEN = 0xB36d3709e22F7c708348E225b20b13eA546E6D9c;
 
-  event RequestEthereumChangeFulfilled(
-    bytes32 indexed requestId,
-    int256 indexed change
-  );
-
-  event RequestEthereumLastMarket(
-    bytes32 indexed requestId,
-    bytes32 indexed market
-  );
-
-  constructor() public Ownable() {
-    setPublicChainlinkToken();
-  }
-
-  function requestEthereumPrice(address _oracle, string _jobId)
-    public
-    onlyOwner
+  // The address of the jobs for ropsten(testnet).
+  // These return an unsigned int
+  string constant private UINT_TICKER_JOB_ROPSTEN = "903c5a53e95141218e2784a6142f53a5";
+ // Once the data comes back, we allow the user to access the data with this function
+  // The main funciton that happens when you request data
+  // onlyOwner means only the owner of the ETH wallet can call this function
+    function requestPopularity(string _artist) public onlyOwner
   {
-    Chainlink.Request memory req = buildChainlinkRequest(stringToBytes32(_jobId), this, this.fulfillEthereumPrice.selector);
-    req.add("get", "https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=USD");
-    req.add("path", "USD");
-    req.addInt("times", 100);
-    sendChainlinkRequestTo(_oracle, req, ORACLE_PAYMENT);
-  }
-  
-    function requestTickerPrice(address _oracle, string _jobId, string _ticker, string _function)
-    public
-    onlyOwner
-  {
-    Chainlink.Request memory req = buildChainlinkRequest(stringToBytes32(_jobId), this, this.fulfillTickerPrice.selector);
-    req.add("function", _function);
-    req.add("symbol", _ticker);
-    req.addInt("times", 10000);
-    string[] memory copyPath = new string[](2);
-    copyPath[0] = "Global Quote";
-    copyPath[1] = "05. price";
+    // We initialize the request, and begin building it
+    Chainlink.Request memory req = buildChainlinkRequest(stringToBytes32(UINT_TICKER_JOB_ROPSTEN), this, this.fulfillPopularity.selector);
+    // We add the parameters from the API
+    req.add("artist", _artist);
+    // This is the location in the JSON return to get
+    string[] memory copyPath = new string[](1);
+    copyPath[0] = "popularity";
     req.addStringArray("copyPath", copyPath);
-    sendChainlinkRequestTo(_oracle, req, ORACLE_PAYMENT);
-  }
-  
-
-  function requestEthereumChange(address _oracle, string _jobId)
-    public
-    onlyOwner
-  {
-    Chainlink.Request memory req = buildChainlinkRequest(stringToBytes32(_jobId), this, this.fulfillEthereumChange.selector);
-    req.add("get", "https://min-api.cryptocompare.com/data/pricemultifull?fsyms=ETH&tsyms=USD");
-    req.add("path", "RAW.ETH.USD.CHANGEPCTDAY");
-    req.addInt("times", 1000000000);
-    sendChainlinkRequestTo(_oracle, req, ORACLE_PAYMENT);
-  }
-  
-  
-  
-
-  function requestEthereumLastMarket(address _oracle, string _jobId)
-    public
-    onlyOwner
-  {
-    Chainlink.Request memory req = buildChainlinkRequest(stringToBytes32(_jobId), this, this.fulfillEthereumLastMarket.selector);
-    req.add("get", "https://min-api.cryptocompare.com/data/pricemultifull?fsyms=ETH&tsyms=USD");
-    string[] memory path = new string[](4);
-    path[0] = "RAW";
-    path[1] = "ETH";
-    path[2] = "USD";
-    path[3] = "LASTMARKET";
-    req.addStringArray("path", path);
-    sendChainlinkRequestTo(_oracle, req, ORACLE_PAYMENT);
+    // Then we make the request
+    sendChainlinkRequestTo(ALPHA_VANTAGE_ADDRESS_ROPSTEN, req, ORACLE_PAYMENT);
   }
 
-  function fulfillEthereumPrice(bytes32 _requestId, uint256 _price)
+      function fulfillPopularity(bytes32 _requestId, uint256 _popularity)
     public
     recordChainlinkFulfillment(_requestId)
   {
-    emit RequestEthereumPriceFulfilled(_requestId, _price);
-    currentPrice = _price;
+    emit RequestPopularityFullfilled(_requestId, _popularity);
+    popularity = _popularity;
   }
-  
-    function fulfillTickerPrice(bytes32 _requestId, uint256 _price)
-    public
-    recordChainlinkFulfillment(_requestId)
-  {
-    emit RequestTickerPriceFulfilled(_requestId, _price);
-    ticker_price = _price;
-  }
+  // Understands when the API call is completed
+  event RequestPopularityFullfilled(
+    bytes32 indexed requestId,
+    uint256 indexed popularity
+  );
 
-  function fulfillEthereumChange(bytes32 _requestId, int256 _change)
-    public
-    recordChainlinkFulfillment(_requestId)
-  {
-    emit RequestEthereumChangeFulfilled(_requestId, _change);
-    changeDay = _change;
-  }
 
-  function fulfillEthereumLastMarket(bytes32 _requestId, bytes32 _market)
-    public
-    recordChainlinkFulfillment(_requestId)
-  {
-    emit RequestEthereumLastMarket(_requestId, _market);
-    lastMarket = _market;
-  }
 
+// Needed functions to make the above work
   function getChainlinkToken() public view returns (address) {
     return chainlinkTokenAddress();
   }
@@ -132,27 +58,17 @@ contract ATestnetConsumer is ChainlinkClient, Ownable {
     require(link.transfer(msg.sender, link.balanceOf(address(this))), "Unable to transfer");
   }
 
-  function cancelRequest(
-    bytes32 _requestId,
-    uint256 _payment,
-    bytes4 _callbackFunctionId,
-    uint256 _expiration
-  )
-    public
-    onlyOwner
-  {
-    cancelChainlinkRequest(_requestId, _payment, _callbackFunctionId, _expiration);
+  constructor() public Ownable() {
+    setPublicChainlinkToken();
   }
-
+  
   function stringToBytes32(string memory source) private pure returns (bytes32 result) {
     bytes memory tempEmptyStringTest = bytes(source);
     if (tempEmptyStringTest.length == 0) {
       return 0x0;
     }
-
     assembly { // solhint-disable-line no-inline-assembly
       result := mload(add(source, 32))
     }
   }
-
 }
