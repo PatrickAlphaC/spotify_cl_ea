@@ -7,7 +7,7 @@ This job is currently hosted on node `0xB36d3709e22F7c708348E225b20b13eA546E6D9c
 Please check out sample.sol for some sample use of getting data from the adapter.
 
 Follow the instructions from: https://docs.chain.link/docs/example-walkthrough, but instead of using `ATestNetConsumer.sol` use `sample.sol` from this repo. And in `requestPopularity` enter the artist ID. 
-
+![](img/requestPopularity.png)
 
 
 ### For external adapter developers and node operators
