@@ -25,9 +25,11 @@ then
   cp ../spotify_cl_ea.py ./spotify_cl_ea.py
   
   pip install spotipy
-  while read requirement; do
-    pip3 install $requirement --target .
-  done < ../requirements.txt
+  pip3 install requests
+#   while read requirement; do
+#     pip3 install $requirement --target .
+#   done < ../requirements.txt
+  
 
 elif [ $1 = 'gcs' ]
 then
