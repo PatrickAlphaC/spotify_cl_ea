@@ -27,8 +27,14 @@ Create the adapter zip for your cloud provider ( gcs or aws )
 
 Upload the created zip to your provider and set the appropriate handler ( gcs_handler or aws_handler ) to be triggered by a HTTP event.
 
-Create an ALPHAVANTAGE_API_KEY environment variable and set it to your Alpha Vantage API key
-You can get one [here](https://www.alphavantage.co/support/#api-key)
+Function to execute: "gcs_handler"
+
+You'll need two environment variables:
+`SPOTIFY_CLIENT_ID`
+`SPOTIFY_CLIENT_SECRET`
+
+You can get them from the [spotify developers page](https://developer.spotify.com/)
+
 
 ## Docker Installation:
 Build the image
