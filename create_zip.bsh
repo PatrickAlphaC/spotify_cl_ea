@@ -25,7 +25,7 @@ then
   cp ../spotify_cl_ea.py ./spotify_cl_ea.py
 
   while read requirement; do
-    pip3 install $requirement --target .
+    pip install $requirement --target .
   done < ../requirements.txt
 
 elif [ $1 = 'gcs' ]
