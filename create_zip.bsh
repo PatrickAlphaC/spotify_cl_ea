@@ -26,8 +26,7 @@ then
   
  
   while read requirement; do
-    pip install spotipy
-    pip3 install requests
+    pip3 install $requirement --target .
   done < ../requirements.txt
   
 
