@@ -30,8 +30,8 @@ Upload the created zip to your provider and set the appropriate handler ( gcs_ha
 Function to execute: "gcs_handler"
 
 You'll need two environment variables:
-`SPOTIFY_CLIENT_ID`
-`SPOTIFY_CLIENT_SECRET`
+`SPOTIPY_CLIENT_ID`
+`SPOTIPY_CLIENT_SECRET`
 
 You can get them from the [spotify developers page](https://developer.spotify.com/)
 
