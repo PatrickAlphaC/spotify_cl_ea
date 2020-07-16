@@ -41,9 +41,9 @@ Build the image
 ```
 docker build -t spotify_cl_ea .
 ```
-Run the container while passing in your SPOTIFY_CLIENT_ID and SPOTIFY_CLIENT_SECRET
+Run the container while passing in your SPOTIPY_CLIENT_ID and SPOTIPY_CLIENT_SECRET
 ```
-docker run -e SPOTIFY_CLIENT_ID=************** -e SPOTIFY_CLIENT_SECRET=************* -p 5000:5000 spotify_cl_ea
+docker run -e SPOTIPY_CLIENT_ID=************** -e SPOTIPY_CLIENT_SECRET=************* -p 5000:5000 spotify_cl_ea
 ```
 The adapter endpoint will be accessable from ```http://localhost/:5000/spotify_cl_ea```
 
